@@ -1,0 +1,9 @@
+/.idea
+/resultados
+/lib
+/dados
+/src/fii_grafos/grafos/__pycache__
+*.pyc
+*.pyc
+*.pyc
+src/fii_grafos/grafos/__pycache__/grafo.cpython-314.pyc

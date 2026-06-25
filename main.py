@@ -22,7 +22,7 @@ if __name__ == "__main__":
          continue
       fiis_grafo = Grafo()
       fiis_grafo.ini_matrizadj(LISTA_FIIS, retornos_ano.corr(),LIMIAR)
-      periodo_analisado.add_ano(ano,fiis_grafo)
+      periodo_analisado.add_grafo(ano,fiis_grafo,LISTA_FIIS[0],LISTA_FIIS[8])
 
 
    periodo_analisado.grafico(LIMIAR)
