@@ -3,3 +3,5 @@
 /lib
 /dados
 **/__pycache__/
+/src/fii_grafos/grafos/__pycache__
+*.pyc

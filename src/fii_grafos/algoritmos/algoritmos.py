@@ -9,8 +9,8 @@ def kruskal(grafo):
     H = []
     T = []
     pai = list(range(tam))
-    total = 0
 
+    total = 0
     for v in range(tam):
         for u in range(tam):
             if matrizG[v][u] != 0:
@@ -24,6 +24,7 @@ def kruskal(grafo):
             if not union(pai, v, u):
                 T.append((id_nome[v], id_nome[u]))
                 total += peso
+
 
     return T, total
 
@@ -46,8 +47,13 @@ def dijkstra(grafo, com, fim):
     id_nome = {i: nome for i, nome in enumerate(vertices_nomes)}
     nome_id = {nome: i for i, nome in enumerate(vertices_nomes)}
 
+    if not grafo.has_node(com) or not grafo.has_node(fim):
+        print(f" Aviso: Origem '{com}' ou Destino '{fim}' não existem neste grafo.")
+        return [], 999
+
     com = nome_id[com]
     fim = nome_id[fim]
+
 
     tam = len(matriz[0])
     vAbertos = list(range(tam))
@@ -77,6 +83,9 @@ def dijkstra(grafo, com, fim):
             if custo[vMin] + matriz[vMin][adj] < custo[adj]:
                 custo[adj] = custo[vMin] + matriz[vMin][adj]
                 rota[adj] = vMin
+
+    if custo[fim] == 999:
+        return [], 999
 
     caminho = []
     atual = fim
@@ -109,6 +118,9 @@ def centralidade_grau(grafo):
     return idgraus
 
 def dfs(grafo,inicio):
+    if not grafo.has_node(inicio):
+         print(f" Aviso DFS: O nó de início '{inicio}' não existe neste grafo.")
+         return []
     vertices_nomes = list(grafo.nodes())
     nome_id = {nome: i for i, nome in enumerate(vertices_nomes)}
     id_nome = {i: nome for i, nome in enumerate(vertices_nomes)}
@@ -123,8 +135,7 @@ def dfs(grafo,inicio):
             visitados.append(v)
             ordem.append(id_nome[v])
             for vizinho in range(len(matrizG[v])):
-                print(vizinho)
                 if vizinho not in visitados:
                     pilha.append(vizinho)
-
+    print(ordem)
     return ordem

@@ -29,14 +29,6 @@ class Grafo:
                     distancia = 1 - r  # d(i,j) = 1 - r(i,j)
                     self.add_arestas(fii_1, fii_2, distancia)
 
-    def plot_grafico(self,id):
-        posicao = nx.spring_layout(self.G)
-        nx.draw(self.G, posicao, with_labels=True, node_color='lightblue', node_size=1200,font_size=7)
-        pesos = nx.get_edge_attributes(self.G, 'weight')
-        pesos_formatados = {aresta: f"{peso:.2f}" for aresta, peso in pesos.items()}
-        nx.draw_networkx_edge_labels(self.G, posicao, edge_labels=pesos_formatados)
-        plt.title(id)
-        plt.show()
 
 
 
