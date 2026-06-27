@@ -22,6 +22,7 @@ Projeto de análise de redes (grafos) aplicado a Fundos de Investimento Imobili�
    ```
 
 2. **Crie um ambiente virtual (recomendado):**
+   - Caso ocorra algum problema nessa parte, tente pelo  [PyCharm](#como-abrir-no-pycharm)
    ```bash
    python -m venv venv
    ```
@@ -36,7 +37,7 @@ Projeto de análise de redes (grafos) aplicado a Fundos de Investimento Imobili�
      source venv/bin/activate
      ```
 
-3. **Instale as dependências:**
+4. **Instale as dependências:**
    ```bash
    pip install -r requirements.txt
    ```
