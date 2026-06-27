@@ -75,14 +75,20 @@ No arquivo `main.py` (ou onde estiverem definidas as constantes), você pode aju
 
 1. Abra o PyCharm e selecione **File > Open**, depois selecione a pasta raiz do projeto (`Projeto-Grafos`).
 
-2. **Configure o interpretador Python (ambiente virtual):**
-   - Vá em **File > Settings** (Windows/Linux) ou **PyCharm > Preferences** (Mac).
-   - Navegue até **Project: Projeto-Grafos > Python Interpreter**.
-   - Clique na engrenagem  ao lado do interpretador atual e escolha **Add Interpreter > Add Local Interpreter**.
-   - Selecione **Existing environment** e aponte para o executável dentro da pasta `venv` criada anteriormente:
-     - Windows: `venv\Scripts\python.exe`
-     - Linux/Mac: `venv/bin/python`
-   - Se ainda não tiver criado o `venv`, você pode deixar o PyCharm criar um novo automaticamente em **New environment using Virtualenv**.
+2. **Configure o interpretador Python (ambiente virtual no PyCharm):**
+
+   **Acessando as configurações:**
+   - Olhe para o canto inferior direito do PyCharm. Clique onde está escrito **"No Interpreter"** (ou na versão do Python atual).
+   - Selecione **Add New Interpreter > Add Local Interpreter...**
+   
+   *(Alternativa: Vá no menu superior em **File > Settings** (Windows) ou **PyCharm > Settings** (Mac) > **Python Interpreter** > **Add Interpreter** > **Add Local Interpreter...**)*
+
+   **Criando o ambiente automaticamente:**
+   - Na janela que abrir, mantenha a opção *Environment* marcada como **Generate new**.
+   - No campo *Type*, selecione **Virtualenv**.
+   - No campo *Base Python*, certifique-se de que uma versão do Python (3.10 ou superior) está selecionada.
+   - No campo *Location*, o PyCharm já vai sugerir automaticamente a criação de uma pasta terminada em `\venv` dentro do seu projeto. Pode deixar como está.
+   - Clique em **OK**. O PyCharm vai criar a pasta e ativar o ambiente sozinho.
 
 3. **Instale as dependências direto pelo PyCharm (opcional):**
    - Abra o arquivo `requirements.txt` no editor.
