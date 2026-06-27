@@ -60,16 +60,6 @@ O programa irá:
    resultados/execucao_<timestamp>_limiar_<valor>/ano_<ano>/
    ```
 
-##  Configurações ajustáveis
-
-No arquivo `main.py` (ou onde estiverem definidas as constantes), você pode ajustar:
-
-| Variável | Descrição |
-|---|---|
-| `LISTA_FIIS` | Lista de tickers dos FIIs a serem analisados (formato `'TICKER11.SA'`) |
-| `LIMIAR` | Valor mínimo de correlação para considerar uma ligação entre dois FIIs (entre -1 e 1) |
-| `origem` / `destino` | Vértices usados para o cálculo do caminho mínimo (Dijkstra) |
-
 
 ## Como abrir no PyCharm
 
@@ -90,14 +80,22 @@ No arquivo `main.py` (ou onde estiverem definidas as constantes), você pode aju
    - No campo *Location*, o PyCharm já vai sugerir automaticamente a criação de uma pasta terminada em `\venv` dentro do seu projeto. Pode deixar como está.
    - Clique em **OK**. O PyCharm vai criar a pasta e ativar o ambiente sozinho.
 
-3. **Instale as dependências direto pelo PyCharm (opcional):**
-   - Abra o arquivo `requirements.txt` no editor.
-   - O PyCharm deve detectar pacotes faltantes e mostrar um aviso no topo do arquivo com um botão **Install requirements** — clique nele.
-   - Alternativamente, abra o terminal integrado (**View > Tool Windows > Terminal**) e rode:
+3.**Instale as dependências direto pelo PyCharm (opcional):**
+   
+   **Método Automático (Recomendado):**
+   - Abra o arquivo `requirements.txt` no editor do PyCharm.
+   - A IDE detectará os pacotes faltantes e exibirá uma barra de aviso no topo. Clique em **Install requirements**.
+
+   **Método Manual (Via Terminal do PyCharm):**
+   - Abra o terminal integrado acessando o menu **View > Tool Windows > Terminal** (ou clique em *Terminal* na barra inferior).
+   - **Importante:** Certifique-se de que o ambiente virtual está ativo. Se não aparecer `(venv)` antes do seu nome no terminal, ative-o com o comando correspondente ao seu sistema operacional:
+     - Windows: `.venv\Scripts\activate`
+     - Linux/Mac: `source venv/bin/activate`
+   - Com o ambiente ativo, execute o comando para instalar os pacotes:
      ```bash
      pip install -r requirements.txt
      ```
-
+     ```
 
 4. **Execute o projeto:**
    - Clique com o botão direito em `main.py` e selecione **Run 'main'**.
@@ -118,6 +116,16 @@ Projeto-Grafos/
 │       └── grafo_temporal.py        # Classe GrafoTemporal
 └── README.md
 ```
+##  Configurações ajustáveis
+
+No arquivo `main.py` (ou onde estiverem definidas as constantes), você pode ajustar:
+
+| Variável | Descrição |
+|---|---|
+| `LISTA_FIIS` | Lista de tickers dos FIIs a serem analisados (formato `'TICKER11.SA'`) |
+| `LIMIAR` | Valor mínimo de correlação para considerar uma ligação entre dois FIIs (entre -1 e 1) |
+| `origem` / `destino` | Vértices usados para o cálculo do caminho mínimo (Dijkstra) |
+
 
 ##  Saídas geradas
 
