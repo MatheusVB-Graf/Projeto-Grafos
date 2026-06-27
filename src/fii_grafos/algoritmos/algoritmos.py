@@ -1,4 +1,6 @@
 import networkx as nx
+import numpy as np
+
 
 def kruskal(grafo):
     vertices_nomes = list(grafo.nodes())
@@ -41,18 +43,18 @@ def union(pai, v, u):
         return False
     return True
 
-def dijkstra(grafo, com, fim):
+def dijkstra(grafo, origem, destino):
     vertices_nomes = list(grafo.nodes())
     matriz = nx.to_numpy_array(grafo, nodelist=vertices_nomes, weight='weight')
     id_nome = {i: nome for i, nome in enumerate(vertices_nomes)}
     nome_id = {nome: i for i, nome in enumerate(vertices_nomes)}
 
-    if not grafo.has_node(com) or not grafo.has_node(fim):
-        print(f" Aviso: Origem '{com}' ou Destino '{fim}' não existem neste grafo.")
-        return [], 999
+    if not grafo.has_node(origem) or not grafo.has_node(destino):
+        print(f" Aviso: Origem '{origem}' ou Destino '{destino}' não existem neste grafo.")
+        return [], 999, origem, destino
 
-    com = nome_id[com]
-    fim = nome_id[fim]
+    com = nome_id[origem]
+    fim = nome_id[destino]
 
 
     tam = len(matriz[0])
@@ -85,7 +87,7 @@ def dijkstra(grafo, com, fim):
                 rota[adj] = vMin
 
     if custo[fim] == 999:
-        return [], 999
+        return [], 999, origem, destino
 
     caminho = []
     atual = fim
@@ -95,7 +97,7 @@ def dijkstra(grafo, com, fim):
     caminho.append(id_nome[com])
     caminho.reverse()
 
-    return caminho, custo[fim]
+    return caminho, custo[fim] , origem, destino
 
 
 def centralidade_grau(grafo):
@@ -118,24 +120,40 @@ def centralidade_grau(grafo):
     return idgraus
 
 def dfs(grafo,inicio):
+
     if not grafo.has_node(inicio):
          print(f" Aviso DFS: O nó de início '{inicio}' não existe neste grafo.")
          return []
+
     vertices_nomes = list(grafo.nodes())
     nome_id = {nome: i for i, nome in enumerate(vertices_nomes)}
     id_nome = {i: nome for i, nome in enumerate(vertices_nomes)}
     matrizG = nx.to_numpy_array(grafo, nodelist=vertices_nomes, weight='weight')
 
-    visitados = []
+    componentes = []
+    visitados = set()
+    referencias = set(range(len(vertices_nomes)))
     pilha = [nome_id[inicio]]
     ordem = []
-    while pilha:
-        v = pilha.pop()
-        if v not in visitados:
-            visitados.append(v)
-            ordem.append(id_nome[v])
-            for vizinho in range(len(matrizG[v])):
-                if vizinho not in visitados:
-                    pilha.append(vizinho)
-    print(ordem)
-    return ordem
+
+    while len(referencias) > 0:
+
+        if not pilha:
+                componentes.append(ordem)
+                ordem = []
+                pilha = [next(iter(referencias))]
+
+
+        while pilha:
+            v = pilha.pop()
+            if v not in visitados:
+                visitados.add(v)
+                ordem.append(id_nome[v])
+                referencias.remove(v)
+                for vizinho in np.nonzero(matrizG[v])[0]:
+                    if vizinho not in visitados:
+                        pilha.append(vizinho)
+    if ordem:
+        componentes.append(ordem)
+
+    return componentes

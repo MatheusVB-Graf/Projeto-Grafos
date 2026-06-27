@@ -1,8 +1,10 @@
 import networkx as nx
-from fii_grafos.algoritmos.algoritmos import dfs,dijkstra,kruskal,centralidade_grau
+from src.fii_grafos.algoritmos.algoritmos import dfs,dijkstra,kruskal,centralidade_grau
 import matplotlib.pyplot as plt
 import os
-from datetime import datetime
+import math
+import textwrap
+
 
 class GrafoTemp:
     def __init__(self):
@@ -14,15 +16,15 @@ class GrafoTemp:
 
 
     def add_grafo(self,periodo,grafo,origem,destino):
-        self.grafos[periodo] = grafo
-        self.mst[periodo] = kruskal(grafo.G)
-        self.dijk[periodo] = dijkstra(grafo.G, origem, destino)
-        self.grau[periodo] = centralidade_grau(grafo.G)
-        self.dfs[periodo] = dfs(grafo.G, origem)
+        self.grafos[periodo] = grafo.getGrafo()
+        self.mst[periodo] = kruskal(grafo.getGrafo())
+        self.dijk[periodo] = dijkstra(grafo.getGrafo(), origem, destino)
+        self.grau[periodo] = centralidade_grau(grafo.getGrafo())
+        self.dfs[periodo] = dfs(grafo.getGrafo(), origem)
 
 
     def getGrafo(self,ano):
-        return self.grafos[ano].G
+        return self.grafos[ano]
 
     def getMst(self,ano):
         return self.mst[ano]
@@ -41,7 +43,7 @@ class GrafoTemp:
         if custo_total > 0:
             mst = nx.Graph()
             mst.add_edges_from(arestas)
-
+            pesos = self.getGrafo(ano)
             plt.figure(figsize=(12, 8))
 
             if nx.is_connected(mst):
@@ -68,138 +70,160 @@ class GrafoTemp:
                 nx.draw_networkx(mst, pos, with_labels=True, node_color='lightblue',
                                  node_size=1000, font_size=7, edge_color='gray')
 
+            pesos_arvore = {}
+            for u, v in mst.edges():
+                peso = pesos[u][v].get('weight', None)
+                if peso is not None:
+                   pesos_arvore[(u, v)] = f"{peso:.2f}"
+
+            nx.draw_networkx_edge_labels(mst, pos, edge_labels=pesos_arvore,
+                                         font_size=7, font_color='darkred')
+
             titulo = f"MST {ano} — custo total: {custo_total:.2f}" if ano else f"MST — custo total: {custo_total:.2f}"
-
-            plt.title(titulo,fontsize=14,fontweight ='bold')
-            plt.axis('off')
-            plt.tight_layout()
-            os.makedirs(pasta_destino, exist_ok=True)
-
-            caminho_arquivo = os.path.join(pasta_destino, f"mst_{ano}.png")
-
-            plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
-            plt.close()
-
-    def plotar_dijk(self,ano,pasta_destino):
-            caminho_arquivo = os.path.join(pasta_destino, f"dijkstra_{ano}.png")
-
-            caminho, custo_total= self.getDijk(ano)
-            grafo = self.getGrafo(ano)
-
-            if grafo is None or grafo.number_of_edges() == 0:
-                plt.figure(figsize=(12, 8))
-                plt.title(f"Dijkstra {ano} — SEM DADOS", fontsize=14, fontweight='bold', color='darkred')
-                plt.text(0.5, 0.5, "Não existem dados ou conexões\npara o ano informado.",
-                         horizontalalignment='center', verticalalignment='center', fontsize=12, color='gray')
-                plt.axis('off')
-
-                os.makedirs(pasta_destino, exist_ok=True)
-                plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
-                plt.close()
-                return
-
-            G = nx.Graph()
-            G.add_nodes_from(caminho)
-
-            plt.figure(figsize=(12, 8))
-            pos = nx.spring_layout(G, seed=42)
-
-            nx.draw_networkx(G, pos, with_labels=True, node_color='lightblue',
-                             node_size=1000, font_size=7, edge_color='lightgray')
-
-            if caminho and custo_total != 999:
-                arestas_caminho = [(caminho[i], caminho[i + 1]) for i in range(len(caminho) - 1)]
-
-                g_caminho = nx.Graph()
-                g_caminho.add_edges_from(arestas_caminho)
-
-                nx.draw_networkx(g_caminho, pos, with_labels=True, node_color='#FF5733',
-                                 node_size=1000, font_size=7, edge_color='#FF5733', width=4.0)
-
-                titulo = f"Dijkstra {ano} — Caminho de {caminho[0]} até {caminho[-1]} (Custo: {custo_total:.2f})"
-            else:
-                titulo = f"Dijkstra {ano} — CAMINHO INEXISTENTE (Custo: 999)"
-
-
             plt.title(titulo, fontsize=14, fontweight='bold')
             plt.axis('off')
             plt.tight_layout()
+        else:
+                plt.figure(figsize=(12, 8))
+                plt.text(0.5, 0.5, f"Não foi possivel gerar arvore",
+                         ha='center', va='center', fontsize=20, fontweight='bold', color='gray')
+                plt.axis('off')
+
+                titulo = f"Custo total arvore: {custo_total}"
+
+                plt.title(titulo,fontsize=14,fontweight ='bold')
+                plt.axis('off')
+                plt.tight_layout()
+
+        os.makedirs(pasta_destino, exist_ok=True)
+        caminho_arquivo = os.path.join(pasta_destino, f"mst_{ano}.png")
+
+        plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
+        plt.close()
+
+    def plotar_dijk(self, ano, pasta_destino):
+            caminho, custo_total, origem, destino = self.getDijk(ano)
+            if custo_total > 0 and caminho:
+                arestas = list(zip(caminho, caminho[1:]))
+                grafo_caminho = nx.Graph()
+                grafo_caminho.add_edges_from(arestas)
+
+                plt.figure(figsize=(12, 8))
+
+                if nx.is_connected(grafo_caminho):
+                    raiz = max(grafo_caminho.degree, key=lambda x: x[1])[0]
+                    pos = nx.bfs_layout(grafo_caminho, start=raiz)
+                    nx.draw_networkx(grafo_caminho, pos, with_labels=True, node_color='lightgreen',
+                                     node_size=1000, font_size=7, edge_color='gray')
+                else:
+                    componentes = list(nx.connected_components(grafo_caminho))
+                    pos = {}
+                    offset_x = 0
+                    for comp in componentes:
+                        sub = grafo_caminho.subgraph(comp)
+                        if len(comp) > 1:
+                            raiz = max(sub.degree, key=lambda x: x[1])[0]
+                            sub_pos = nx.bfs_layout(sub, start=raiz)
+                        else:
+                            sub_pos = {list(comp)[0]: (0, 0)}
+
+                        for nodo, (x, y) in sub_pos.items():
+                            pos[nodo] = (x + offset_x, y)
+                        offset_x += 3
+
+                    nx.draw_networkx(grafo_caminho, pos, with_labels=True, node_color='lightgreen',
+                                     node_size=1000, font_size=7, edge_color='gray')
+
+
+                titulo = f"Caminho mínimo {ano} - {origem} para {destino} — custo total: {custo_total:.2f}" if ano else f"Caminho mínimo — custo total: {custo_total:.2f}"
+                plt.title(titulo, fontsize=14, fontweight='bold')
+                plt.axis('off')
+                plt.tight_layout()
+
+            else:
+                plt.figure(figsize=(12, 8))
+                plt.text(0.5, 0.5, "Sem caminho encontrado",
+                         ha='center', va='center', fontsize=20, fontweight='bold', color='gray')
+                plt.axis('off')
+
+                titulo = f"Caminho mínimo {ano} — sem caminho de {origem} para {destino}" if ano else "Caminho mínimo — sem caminho"
+                plt.title(titulo, fontsize=14, fontweight='bold')
+                plt.tight_layout()
 
             os.makedirs(pasta_destino, exist_ok=True)
+            caminho_arquivo = os.path.join(pasta_destino, f"dijkstra_{ano}.png")
             plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
             plt.close()
 
-    def plotar_dfs(self,ano,pasta_destino):
-        grafo = self.getGrafo(ano)
-        ordem_visitacao = self.getDfs(ano)
+    def plotar_dfs(self, ano, pasta_destino):
+            G = self.getGrafo(ano)
+            componentes = self.getDfs(ano)
 
-        if grafo is None or grafo.number_of_edges() == 0:
-            plt.figure(figsize=(12, 8))
-            plt.title(f"DFS {ano} — SEM DADOS", fontsize=14, fontweight='bold', color='darkred')
-            plt.text(0.5, 0.5, "Não existem dados ou conexões\npara o ano informado.",
-                     horizontalalignment='center', verticalalignment='center', fontsize=12, color='gray')
-            plt.axis('off')
+            if componentes:
+                n_comp = len(componentes)
+                largura_max_caracteres = 40
 
-            os.makedirs(pasta_destino, exist_ok=True)
-            plt.savefig(os.path.join(pasta_destino, f"dfs_{ano}.png"), dpi=300, bbox_inches='tight')
-            plt.close()
-            return
+                dados_tabela = []
+                alturas_linha = []
 
-            # 1. Organiza os dados da DFS em colunas (Passo, Código do Ativo, Função)
-        dados_tabela = []
-        for i, fii in enumerate(ordem_visitacao):
-            passo = f"{i + 1}º"
-            dados_tabela.append([passo, fii])
+                for i, vertices in enumerate(componentes):
+                    posicao = f"{i + 1}º"
+                    nos_str = ", ".join(map(str, vertices))
+                    nos_wrapped = "\n".join(textwrap.wrap(nos_str, width=largura_max_caracteres))
+                    dados_tabela.append([posicao, nos_wrapped])
+                    alturas_linha.append(max(1, len(textwrap.wrap(nos_str, width=largura_max_caracteres))))
 
-        # 2. Configura a figura proporcional ao tamanho da lista
-        fig, ax = plt.subplots(figsize=(6, len(ordem_visitacao) * 0.3 + 1))
-        ax.axis('off')
 
-        # 3. MODIFICADO: Títulos das colunas reduzidos para duas opções
-        colunas_titulos = ["Ordem", "Ativo (FII)"]
-        tabela = ax.table(
-            cellText=dados_tabela,
-            colLabels=colunas_titulos,
-            loc='center',
-            cellLoc='center'
-        )
+                altura_total = sum(alturas_linha) * 0.3 + 1
+                fig, ax = plt.subplots(figsize=(7, altura_total))
+                ax.axis('off')
 
-        tabela.auto_set_font_size(False)
-        tabela.set_fontsize(10)
-        tabela.scale(1.2, 1.4)
+                colunas_titulos = ["Componente", "Nós"]
+                tabela = ax.table(
+                    cellText=dados_tabela,
+                    colLabels=colunas_titulos,
+                    loc='center',
+                    cellLoc='center'
+                )
 
-        # 4. Estilização da tabela com as duas colunas
-        for (row, col), cell in tabela.get_celld().items():
-            if row == 0:
-                cell.set_text_props(weight='bold', color='white')
-                cell.set_facecolor('#9B59B6')  # Roxo para o topo
-            else:
-                # Efeito Zebra alternando linhas
-                if row % 2 == 0:
-                    cell.set_facecolor('#F8F9F9')
+                tabela.auto_set_font_size(False)
+                tabela.set_fontsize(10)
+                tabela.scale(1.2, 1.4)
 
-                # Destaca sutilmente a primeira linha (Início) e a última linha (Fim)
-                if row == 1:
-                    cell.set_facecolor('#EAFAF1')  # Verde suave para o início da DFS
-                    cell.set_text_props(weight='bold')
-                elif row == len(ordem_visitacao):
-                    cell.set_facecolor('#FDEDEC')  # Vermelho suave para o final da DFS
-                    cell.set_text_props(weight='bold')
+                for (row, col), cell in tabela.get_celld().items():
+                    if row == 0:
+                        cell.set_text_props(weight='bold', color='white')
+                        cell.set_facecolor('#2C3E50')
+                    else:
 
-        plt.title(f"Ordem de Visitação do DFS — Ano {ano}\n", fontsize=14, fontweight='bold')
-        plt.tight_layout()
+                        n_linhas = alturas_linha[row - 1]
+                        cell.set_height(cell.get_height() * n_linhas)
 
-        # 5. Salva a tabela limpa como imagem .png
-        os.makedirs(pasta_destino, exist_ok=True)
-        caminho_arquivo = os.path.join(pasta_destino, f"dfs_{ano}.png")
-        plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
-        plt.close()
+                        if row % 2 == 0:
+                            cell.set_facecolor('#F8F9F9')
+
+                        if row == 1:
+                            cell.set_facecolor('#FEF9E7')
+                            cell.set_text_props(weight='bold')
+
+
+                titulo = f"Componentes {ano} — {n_comp} componente(s)" if ano else f"Componentes Conexos — {n_comp} componente(s)"
+
+                plt.title(titulo, fontsize=14, fontweight='bold')
+                plt.axis('off')
+                plt.tight_layout()
+                os.makedirs(pasta_destino, exist_ok=True)
+
+                caminho_arquivo = os.path.join(pasta_destino, f"dfs_{ano}.png")
+
+                plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
+                plt.close()
 
     def plotar_grau(self,ano,pasta_destino):
         idgraus = self.grau.get(ano)
 
         if not idgraus:
-            # Imagem de aviso padrão caso não existam dados de graus para o ano
+
             plt.figure(figsize=(8, 4))
             plt.title(f"Grau {ano} — SEM DADOS", fontsize=14, fontweight='bold', color='darkred')
             plt.text(0.5, 0.5, "Não existem dados de centralidade para este ano.",
@@ -210,16 +234,16 @@ class GrafoTemp:
             plt.close()
             return
 
-        # 2. MÁGICA: Ordena o dicionário pelo valor (grau) do maior para o menor
+
         graus_ordenados = sorted(idgraus.items(), key=lambda item: item[1], reverse=True)
 
-        # 3. Organiza os dados para a tabela (Posição, Ativo, Grau)
+
         dados_tabela = []
         for i, (fii, valor_grau) in enumerate(graus_ordenados):
             posicao = f"{i + 1}º"
             dados_tabela.append([posicao, fii, int(valor_grau)])
 
-        # 4. Configura a figura proporcional à quantidade de ativos
+
         fig, ax = plt.subplots(figsize=(7, len(dados_tabela) * 0.3 + 1))
         ax.axis('off')
 
@@ -236,17 +260,17 @@ class GrafoTemp:
         tabela.set_fontsize(10)
         tabela.scale(1.2, 1.4)
 
-        # 6. Estilização da tabela (Cabeçalho azul/escuro e linhas zebradas)
+
         for (row, col), cell in tabela.get_celld().items():
             if row == 0:
                 cell.set_text_props(weight='bold', color='white')
-                cell.set_facecolor('#2C3E50')  # Azul Escuro/Grafite para diferenciar do DFS roxo
+                cell.set_facecolor('#2C3E50')
             else:
                 # Efeito Zebra
                 if row % 2 == 0:
                     cell.set_facecolor('#F8F9F9')
 
-                # Destaca em dourado/amarelo suave o 1º colocado (o hub do grafo)
+
                 if row == 1:
                     cell.set_facecolor('#FEF9E7')
                     cell.set_text_props(weight='bold')
@@ -254,12 +278,11 @@ class GrafoTemp:
         plt.title(f"Ranking de FIIS por Grau — Ano {ano}\n", fontsize=14, fontweight='bold')
         plt.tight_layout()
 
-        # 7. Salva o arquivo de imagem na pasta correspondente
+
         os.makedirs(pasta_destino, exist_ok=True)
         caminho_arquivo = os.path.join(pasta_destino, f"grau_{ano}.png")
         plt.savefig(caminho_arquivo, dpi=300, bbox_inches='tight')
         plt.close()
-
 
     def salvar_resultados(self,ano,pasta_destino):
 
@@ -269,7 +292,7 @@ class GrafoTemp:
 
         print(f"    Processando dados do ano {ano}...")
 
-        # --- 1. PLOT DA MST (Kruskal) ---
+
         try:
             self.plotar_mst(ano, pasta_ano)
             print("       Gráfico MST gerado.")

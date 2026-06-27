@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
+from itertools import combinations
 
 class Grafo:
     def __init__(self):
@@ -18,18 +19,14 @@ class Grafo:
         fiis_validos = [fii for fii in LISTA_FIIS if fii in correlacoes.columns]
         self.add_vertices(fiis_validos)
 
-        for i in range(len(fiis_validos)):
-            for j in range(i + 1, len(fiis_validos)):
-                fii_1 = fiis_validos[i]
-                fii_2 = fiis_validos[j]
+        for fii_1, fii_2 in combinations(fiis_validos, 2):
+            r = correlacoes.loc[fii_1, fii_2]
 
-                r = correlacoes.loc[fii_1, fii_2]
-
-                if pd.notna(r) and r > limiar:
-                    distancia = 1 - r  # d(i,j) = 1 - r(i,j)
-                    self.add_arestas(fii_1, fii_2, distancia)
+            if pd.notna(r) and r > limiar:
+                distancia = 1 - r
+                self.add_arestas(fii_1, fii_2, distancia)
 
 
-
-
+    def getGrafo(self):
+        return self.G
 
