@@ -2,7 +2,6 @@ import networkx as nx
 from src.fii_grafos.algoritmos.algoritmos import dfs,dijkstra,kruskal,centralidade_grau
 import matplotlib.pyplot as plt
 import os
-import math
 import textwrap
 
 
