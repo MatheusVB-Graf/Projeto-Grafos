@@ -98,9 +98,10 @@ O programa irá:
      ```
 
 4. **Execute o projeto:**
-   - Clique com o botão direito em `main.py` e selecione **Run 'main'**.
-   - Ou abra o arquivo e use o botão  verde no canto superior direito do editor.
 
+    ```bash
+     python ./main.py
+     ``` 
 
 ## Estrutura do projeto
 
