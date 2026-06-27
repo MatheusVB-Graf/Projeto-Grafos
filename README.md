@@ -95,7 +95,6 @@ O programa irá:
      ```bash
      pip install -r requirements.txt
      ```
-     ```
 
 4. **Execute o projeto:**
 
