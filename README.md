@@ -55,7 +55,7 @@ O programa irá:
 2. Calcular os retornos e a matriz de correlação para cada período (ano).
 3. Construir os grafos a partir da matriz de correlação, usando o limiar (`LIMIAR`) definido no código.
 4. Calcular MST, caminho mínimo (Dijkstra), componentes conexos (DFS) e grau dos verticespara cada período.
-5. Gerar gráficos e tabelas, salvos automaticamente em pelo metodos `salvar_resultados` da classe `GrafoTemporal`:
+5. Gerar e salvar gráficos e tabelas, a partir do metodo`salvar_resultados` da classe `GrafoTemporal`:
    ```
    resultados/execucao_<timestamp>_limiar_<valor>/ano_<ano>/
    ```
@@ -88,7 +88,7 @@ O programa irá:
 
    **Método Manual (Via Terminal do PyCharm):**
    - Abra o terminal integrado acessando o menu **View > Tool Windows > Terminal** (ou clique em *Terminal* na barra inferior).
-   - **Importante:** Certifique-se de que o ambiente virtual está ativo. Se não aparecer `(venv)` antes do seu nome no terminal, ative-o com o comando correspondente ao seu sistema operacional:
+   - **Importante:** Certifique-se de que o ambiente virtual esteja ativo. Se não aparecer `(venv)` antes do seu nome no terminal, ative-o com o comando correspondente ao seu sistema operacional:
      - Windows: `.venv\Scripts\activate`
      - Linux/Mac: `source venv/bin/activate`
    - Com o ambiente ativo, execute o comando para instalar os pacotes:
