@@ -43,11 +43,11 @@ class GrafoTemp:
             mst = nx.Graph()
             mst.add_edges_from(arestas)
             pesos = self.getGrafo(ano)
-            plt.figure(figsize=(12, 8))
+            plt.figure(figsize=(max(12, len(mst) * 0.6), max(8, len(mst) * 0.4)))
 
             if nx.is_connected(mst):
                 raiz = max(mst.degree, key=lambda x: x[1])[0]
-                pos = nx.bfs_layout(mst, start=raiz)
+                pos = nx.bfs_layout(mst, start=raiz, scale=len(mst) * 1.5)
                 nx.draw_networkx(mst, pos, with_labels=True, node_color='lightblue',
                                  node_size=1000, font_size=7, edge_color='gray')
             else:
@@ -58,13 +58,17 @@ class GrafoTemp:
                     sub = mst.subgraph(comp)
                     if len(comp) > 1:
                         raiz = max(sub.degree, key=lambda x: x[1])[0]
-                        sub_pos = nx.bfs_layout(sub, start=raiz)
+                        sub_pos = nx.bfs_layout(sub, start=raiz, scale=len(comp) * 1.5)
                     else:
                         sub_pos = {list(comp)[0]: (0, 0)}
 
+                    xs = [p[0] for p in sub_pos.values()]
+                    largura_real = (max(xs) - min(xs)) if len(xs) > 1 else 0
+                    x_min = min(xs)
+
                     for nodo, (x, y) in sub_pos.items():
-                        pos[nodo] = (x + offset_x, y)
-                    offset_x += 3
+                        pos[nodo] = (x - x_min + offset_x, y)
+                    offset_x += largura_real + 5
 
                 nx.draw_networkx(mst, pos, with_labels=True, node_color='lightblue',
                                  node_size=1000, font_size=7, edge_color='gray')
@@ -76,7 +80,8 @@ class GrafoTemp:
                    pesos_arvore[(u, v)] = f"{peso:.2f}"
 
             nx.draw_networkx_edge_labels(mst, pos, edge_labels=pesos_arvore,
-                                         font_size=7, font_color='darkred')
+                                         font_size=6, font_color='darkred',
+                                         bbox=dict(facecolor='white', edgecolor='none', alpha=0.7, pad=0.5))
 
             titulo = f"MST {ano} — custo total: {custo_total:.2f}" if ano else f"MST — custo total: {custo_total:.2f}"
             plt.title(titulo, fontsize=14, fontweight='bold')

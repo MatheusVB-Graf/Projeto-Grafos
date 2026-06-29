@@ -10,7 +10,7 @@ from datetime import datetime
 DIR_ATUAL = Path(__file__).resolve().parent
 DIR_DADOS = DIR_ATUAL / "dados"
 DIR_RESULT = "resultados"
-LIMIAR = 0.5
+LIMIAR = 0.3
 
 if __name__ == "__main__":
    LISTA_FIIS, df = carregar_dados(DIR_DADOS)
